@@ -1,10 +1,11 @@
 import React from 'react'
+import DashboardLayout from "../../components/Layouts/DashboardLayout.jsx";
 
 function InterviewPage() {
   return (
-    <div>
+    <DashboardLayout>
         Interview page
-    </div>
+    </DashboardLayout>
   )
 }
 

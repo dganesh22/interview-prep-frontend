@@ -1,11 +1,17 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {useNavigate} from "react-router";
 import Input from "../../components/Inputs/Input.jsx";
 import ProfileImageSelector from "../../components/Inputs/ProfileImageSelector.jsx";
 import {validateEmail} from "../../util/helper.js";
+import {UserContext} from "../../context/UserContext.jsx";
+import axiosInstance from "../../util/axiosInstance.js";
+import {API_PATHS} from "../../util/apiPath.js";
+import toast from "react-hot-toast";
+import uploadImage from "../../util/uploadImage.js";
 
 function Signup(props) {
     const { setCurrentPage } = props
+    const { updateUser } = useContext(UserContext)
 
     const [profilePic,setProfilePic] = useState(null)
     const [fullName,setFullname] = useState("")
@@ -44,7 +50,26 @@ function Signup(props) {
 
         // Signup api call
         try {
+                if(profilePic) {
+                    const imgUploadRes = await uploadImage(profilePic);
+                    profileImageUrl = imgUploadRes.imageUrl || "";
+                }
 
+                const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+                    name: fullName,
+                    email,
+                    password,
+                    profileImageUrl
+                })
+
+            const { token }  = response?.data
+
+            if(token) {
+                sessionStorage.setItem("accessToken", token)
+                updateUser(response?.data)
+                toast.success(response?.data.message)
+                navigate(`/dashboard`)
+            }
         }catch (err) {
              if(err.response && err.response.data.message) {
                 setErrors(err.response.data.message)

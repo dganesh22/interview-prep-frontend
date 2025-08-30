@@ -1,7 +1,11 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {useNavigate} from "react-router";
 import Input from "../../components/Inputs/Input.jsx";
 import {validateEmail} from "../../util/helper.js";
+import axiosInstance from "../../util/axiosInstance.js";
+import {API_PATHS} from "../../util/apiPath.js";
+import toast from "react-hot-toast";
+import {UserContext} from "../../context/UserContext.jsx";
 
 function Login(props) {
     const { setCurrentPage } = props
@@ -10,6 +14,7 @@ function Login(props) {
     const [errors,setErrors] = useState(null)
 
     const navigate = useNavigate()
+    const { updateUser } = useContext(UserContext)
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -28,10 +33,21 @@ function Login(props) {
         
         // login api call
         try {
-            
+            const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+               email,
+              password,
+            });
+            const token = response?.data.token;
+            if(token) {
+                sessionStorage.setItem("accessToken", token)
+                toast.success(response?.data.message)
+                updateUser(response?.data)
+                navigate(`/dashboard`)
+            }
         }catch (err) {
             if(err.response && err.response.data.message) {
                 setErrors(err.response.data.message)
+                // toast.error(err?.response.data.message)
             } else {
                 setErrors("Something went wrong, please try again")
             }

@@ -102,3 +102,7 @@
 .summary-item {
     @apply text-[10px] font-medium text-gray-700 px-3 py-1 border-[0.5px] border-gray-900 rounded-xl;
 }
+
+.header-item {
+    @apply text-[12px] font-medium bg-black text-white rounded-md px-3 py-1;
+}

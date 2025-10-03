@@ -1,8 +1,25 @@
 import React from 'react';
+import {LuX} from "react-icons/lu";
 
 function Drawer(props) {
+    const { isOpen, onClose, title, children } = props
+
     return (
-        <div>Drawer</div>
+        <div className={`fixed top-[64px] right-0 z-130 h-[calc(100vh-64px)] p-4 overflow-y-auto transition-transform bg-white w-full md:w-[40vw] shadow-2xl shadow-cyan-800/10 border-r border-l-gray-700 ${isOpen ? "translate-x-0": "translate-x-full"}`} tabIndex={-1} aria-labelledby={"drawer-right-label"}>
+                <div className="flex items-center justify-between mb-4">
+                    <h5 id={"drawer-right-label"} className="flex items-center text-base font-semibold text-amber-600">
+                        { title }
+                    </h5>
+                    <button type={"button"} onClick={onClose} className="text-red-500 bg-transparent hover:bg-red-100 hover:text-red-900 rounded-lg text-sm w-8 h-8 inline-flex items-center justify-center cursor-pointer">
+                        <LuX className={"text-lg"}/>
+                    </button>
+                </div>
+
+        {/*  body  section */}
+            <div className="text-sm mx-3 mb-6">
+                { children }
+            </div>
+        </div>
     );
 }
 

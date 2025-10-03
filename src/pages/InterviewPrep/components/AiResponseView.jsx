@@ -7,7 +7,7 @@ import {oneLight} from "react-syntax-highlighter/src/styles/prism/index.js";
 function AiResponseView(props) {
     const { content } = props;
 
-    if(!content) return <div className="text-sm text-gray-400">No answer found</div>
+    if(!content) return <div className="text-sm text-gray-400 text-center">No answer found</div>
     return (
         <div className="max-w-4xl mx-auto">
             <div className="text-[14px] prose prose-slate dark:prose-invert max-w-none">

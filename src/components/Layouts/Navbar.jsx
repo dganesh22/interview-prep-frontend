@@ -8,7 +8,7 @@ function Navbar(props) {
             <div className="container mx-auto flex items-center justify-between gap-5">
                 <NavLink className="text-lg md:text-xl font-medium  text-black leading-5" to={`/dashboard`}>
                     <h2 className="">
-                        Interview Prep AI
+                        WebGurukula
                     </h2>
                 </NavLink>
                 <ProfileInfoCard/>

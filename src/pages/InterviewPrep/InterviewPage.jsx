@@ -50,7 +50,31 @@ function InterviewPage(props) {
     }
 
     // generate concept explanation
-    const generateConceptExplanation = async (question) => {}
+    const generateConceptExplanation = async (question) => {
+        try {
+            setErrorMsg("")
+            setExplanation(null)
+            setIsLoading(true)
+            setLoadingStatus("generating explanation..")
+            setOpenLeanMoreDrawer(true)
+
+            const response = await axiosInstance.post(API_PATHS.AI.GENERATE_EXPLANATION, { question })
+
+            if(response?.data) {
+                toast.success(response?.data?.message)
+                setExplanation(response?.data?.output)
+            }
+        }catch (err) {
+            setExplanation(null)
+            setExplanation("Failed to generate the explanation.. Try again later..")
+            console.error("error", err)
+            setLoadingStatus("")
+            setIsLoading(false)
+        } finally {
+            setIsLoading(false)
+            setLoadingStatus("")
+        }
+    }
 
     // pin question
     const toggleQuestionPinStatus = async (questionId) => {
@@ -68,7 +92,43 @@ function InterviewPage(props) {
     }
 
     // add more questions to session
-    const uploadMoreQuestions = async () => {}
+    const uploadMoreQuestions = async () => {
+        try {
+            setIsUpdateLoader(true)
+            setLoadingStatus("AI is Generating More Questions.. Please Wait..")
+            //call ai api to generate more questions
+            const aiResponse = await axiosInstance.post(API_PATHS.AI.GENERATE_QUESTIONS, {
+                role: sessionData?.role,
+                experience: sessionData?.experience,
+                topicsToFocus: sessionData?.topicsToFocus,
+                numberOfQuestions: 10,
+            })
+
+            // should be array like questions
+            const generatedQuestions = aiResponse?.data?.output;
+            const response = await axiosInstance.post(API_PATHS.QUESTION.ADD_TO_SESSION,{
+                sessionId,
+                questions: generatedQuestions
+            })
+
+            if(response?.data){
+                toast.success(response?.data?.message)
+                fetchSessionData()
+            }
+
+        }catch (err) {
+            setLoadingStatus("")
+            if(err?.response && err?.response?.data?.message){
+                setErrorMsg(err?.response?.data?.message)
+            } else {
+                setErrorMsg("Something went wrong... Please try again..")
+            }
+        } finally {
+            setIsLoading(false)
+            setIsUpdateLoader(false)
+            setLoadingStatus("")
+        }
+    }
 
     useEffect(() => {
         if(sessionId) {
@@ -124,7 +184,27 @@ function InterviewPage(props) {
                                                             isPinned={item?.isPinned}
                                                             onTogglePin={() => toggleQuestionPinStatus(item?._id)}
                                                         />
-                                                     </>
+
+
+                                                     {
+                                                         !isLoading && sessionData?.questions?.length === index + 1 && (
+                                                             <div className={"flex items-center justify-center mt-5"}>
+                                                                    <button className="flex items-center gap-3 text-sm text-black font-medium bg-gray-200 px-5 py-2 mr-2 rounded text-nowrap cursor-pointer"
+                                                                    onClick={() => uploadMoreQuestions()}
+                                                                            disabled={isLoading && isUpdateLoader}
+                                                                    >
+                                                                        {
+                                                                            isUpdateLoader ? ( <SpinnerLoader className={"text-white"} />): (
+                                                                                <LuListCollapse className={"text-lg"}/>
+                                                                            )
+                                                                        }{" "} {
+                                                                            isUpdateLoader ? loadingStatus : "Load More..."
+                                                                    }
+                                                                    </button>
+                                                             </div>
+                                                         )
+                                                     }
+                                                      </>
                                                  </motion.div>
                                              )
                                          })
@@ -138,6 +218,14 @@ function InterviewPage(props) {
                             onClose={() => setOpenLeanMoreDrawer(false)}
                             title={!isLoading && explanation?.title }
                          >
+                             {
+                                 isLoading && (
+                                     <div className={"flex items-center justify-center flex-col mx-10 my-10"}>
+                                         <SpinnerLoader/>
+                                         <span> {loadingStatus} </span>
+                                     </div>
+                                 )
+                             }
                              {
                                  errorMsg && (
                                      <p className={"flex gap-2 text-amber-600 font-medium"}>

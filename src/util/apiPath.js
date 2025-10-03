@@ -1,4 +1,8 @@
-export const BASE_URL="http://localhost:5222";
+// export const BASE_URL="http://localhost:5222";
+
+// production url
+export const BASE_URL="https://interview-prep-ai-api.onrender.com";
+
 export  const API_PATHS = {
     AUTH: {
         REGISTER:"/api/auth/register", // register new user

@@ -9,6 +9,7 @@ import {API_PATHS} from "../../util/apiPath.js";
 import SummaryCard from "../../components/Cards/SummaryCard.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 import CreateSessionForm from "../../components/Forms/CreateSessionForm.jsx";
+import DeleteAlertContent from "../../components/Modal/DeleteAlertContent.jsx";
 
 function Dashboard() {
     const navigate = useNavigate()
@@ -21,7 +22,7 @@ function Dashboard() {
     });
 
     // fetch all sessions
-    const fecthAllSessions = async () => {
+    const fetchAllSessions = async () => {
         try {
             const response = await axiosInstance.get(API_PATHS.SESSION.GET_ALL)
             setSessions(response?.data.sessions)
@@ -31,10 +32,24 @@ function Dashboard() {
     }
 
     // delete session
-    const deleteSession = async (sessionData) => {}
+    const deleteSession = async (sessionData) => {
+        // console.log(`session data =`, sessionData)
+        try {
+          let resp =  await axiosInstance.delete(API_PATHS.SESSION.DELETE(sessionData?._id))
+            toast.success(resp?.data?.message)
+            setOpenDeleteAlert({
+                open: false,
+                data: null
+            });
+
+            fetchAllSessions()
+        }catch (e) {
+            console.error(e?.message)
+        }
+    }
 
     useEffect(() => {
-        fecthAllSessions()
+        fetchAllSessions()
     }, []);
   return (
     <DashboardLayout>
@@ -45,7 +60,7 @@ function Dashboard() {
                             return <SummaryCard key={index} {...item}
                                 colors={CARD_BG[index % CARD_BG.length]}
                                 onSelect={() => navigate(`/interview-prep/${item?._id}`)}
-                                onDelete={() => setOpenDeleteAlert({ open: true, item })}
+                                onDelete={() => setOpenDeleteAlert({ open: true, data:item })}
                             />
                         })
                     }
@@ -66,6 +81,25 @@ function Dashboard() {
         >
             <div className="">
                 <CreateSessionForm/>
+            </div>
+        </Modal>
+
+    {/*  delete confirm modal */}
+        <Modal
+            isOpen={openDeleteAlert?.open}
+            onClose={() => {
+                setOpenDeleteAlert(!openDeleteAlert?.open)
+            }}
+            title={"Delete Confirmation"}
+        >
+            <div className="w-[30vw]">
+                <DeleteAlertContent
+                    content={"Are you sure you want to delete this session?"}
+                    onDelete={() => deleteSession(openDeleteAlert?.data)}
+                    onClose={() => {
+                setOpenDeleteAlert(!openDeleteAlert?.open)
+            }}
+                />
             </div>
         </Modal>
     </DashboardLayout>

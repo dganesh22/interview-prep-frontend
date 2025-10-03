@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react'
-import {useNavigate} from 'react-router'
+import {NavLink, useNavigate} from 'react-router'
 import {APP_FEATURES} from '../util/data.js'
 import { LuSparkles } from 'react-icons/lu'
 import heroImage from '../assets/hero.svg'
@@ -24,15 +24,16 @@ function LandingPage() {
     }
     return (
         <section>
-            <div className={"w-[90%] mx-auto min-h-full  bg-[#fff]"}>
+            <div className={"w-[100%] mx-auto min-h-full  bg-[#fff]"}>
             <div className="w-[500px] h-[500px] bg-[#fff] blur-[65px] absolute top-0 left-0 "></div>
 
             <div className="container mx-auto px-4 pt-6 pb-[200px] relative z-10">
                 {/*  header */}
                 <header className="flex justify-between items-center mb-16">
-                    <div className="text-xl text-black font-bold">
-                        Interview Prep AI
-                    </div>
+                    <NavLink to={`/`} className="text-black font-bold flex items-center justify-between flex-col">
+                         <span className="text-2xl">WebGurukula</span>
+                         <span className="text-sm">(Interview Prep AI)</span>
+                    </NavLink>
                     {
                         user ? <ProfileInfoCard/> : (
                             <button
@@ -45,7 +46,7 @@ function LandingPage() {
                 </header>
 
                 {/* Hero Content */}
-                <div className="flex flex-col md:flex-row  items-center ">
+                <div className="flex flex-col md:flex-row  items-center">
                     <div className="w-full md:w-1/2 pr-4 mb-8 md:mb-0 px-6">
                         <div className="flex items-center justify-left mb-2">
                             <div
